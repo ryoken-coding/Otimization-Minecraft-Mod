@@ -1,0 +1,40 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+// Minecraft 26.3 uses official names; do not add mappings for another version.
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = 'UTF-8'
+}
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand(version: project.version) }
+}
+jar {
+    from('LICENSE')
+    from('THIRD_PARTY_NOTICES.md')
+}
+
+// Dependency-free tests also run through scripts/test-core.sh when Maven is blocked.
+tasks.register('coreTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.ryokencoding.omperf.CoreTests'
+    jvmArgs '-ea', '-Xms128m', '-Xmx128m'
+}
+check.dependsOn coreTest
