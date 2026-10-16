@@ -1,0 +1,6 @@
+# Copy to <game-or-server>/config/omperf.properties; restart required.
+# Off by default. No disk writes, automatic reports or remote telemetry.
+diagnostics.enabled=false
+# Integer 128..65536; primitive storage = 8 * windowSamples bytes.
+# 4096 samples ~205 seconds at 20 completed ticks/s (not guaranteed).
+diagnostics.windowSamples=4096
